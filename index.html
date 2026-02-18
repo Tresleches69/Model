@@ -1,1 +1,252 @@
+import { useState, useMemo } from "react";
+import { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell } from "recharts";
 
+const RAW_PLAYERS = [{"rank":1,"name":"Scottie Scheffler","total":86.57,"score_sg_ott":100.0,"score_sg_putt":70.32,"score_sg_app":68.59,"score_sg_arg":67.47,"score_sg_ttg":96.47,"score_masters":96.63,"score_torrey":null,"score_riviera":100,"score_par4":95.83,"score_random":68.43,"raw_sg_ott":1.026,"raw_sg_putt":0.703,"raw_sg_app":0.424,"raw_sg_arg":0.645,"raw_sg_ttg":2.094,"raw_par4":3.8,"riv2024":"N/A","riv2023":"-8","riv2022":"-12","riv2021":"N/A","masters2025":"4","torrey2026":"N/A"},{"rank":2,"name":"Tommy Fleetwood","total":83.43,"score_sg_ott":78.57,"score_sg_putt":62.88,"score_sg_app":77.16,"score_sg_arg":84.45,"score_sg_ttg":98.88,"score_masters":77.53,"score_torrey":null,"score_riviera":85,"score_par4":100.0,"score_random":56.22,"raw_sg_ott":0.351,"raw_sg_putt":0.403,"raw_sg_app":0.773,"raw_sg_arg":1.109,"raw_sg_ttg":2.234,"raw_par4":3.78,"riv2024":"N/A","riv2023":"-5","riv2022":"N/A","riv2021":"N/A","masters2025":"21","torrey2026":"N/A"},{"rank":3,"name":"Rory McIlroy","total":80.15,"score_sg_ott":66.67,"score_sg_putt":50.47,"score_sg_app":100.0,"score_sg_arg":55.07,"score_sg_ttg":94.61,"score_masters":100.0,"score_torrey":null,"score_riviera":88,"score_par4":95.83,"score_random":68.57,"raw_sg_ott":-0.024,"raw_sg_putt":-0.098,"raw_sg_app":1.703,"raw_sg_arg":0.306,"raw_sg_ttg":1.986,"raw_par4":3.8,"riv2024":"N/A","riv2023":"-4","riv2022":"-10","riv2021":"N/A","masters2025":"1","torrey2026":"N/A"},{"rank":4,"name":"Sepp Straka","total":78.53,"score_sg_ott":85.33,"score_sg_putt":55.05,"score_sg_app":77.9,"score_sg_arg":70.33,"score_sg_ttg":96.4,"score_masters":null,"score_torrey":null,"score_riviera":72,"score_par4":68.75,"score_random":72.58,"raw_sg_ott":0.564,"raw_sg_putt":0.087,"raw_sg_app":0.803,"raw_sg_arg":0.723,"raw_sg_ttg":2.09,"raw_par4":3.93,"riv2024":"N/A","riv2023":"-1","riv2022":"-8","riv2021":"N/A","masters2025":"-","torrey2026":"N/A"},{"rank":5,"name":"Jason Day","total":76.63,"score_sg_ott":73.4,"score_sg_putt":78.49,"score_sg_app":67.24,"score_sg_arg":60.34,"score_sg_ttg":77.73,"score_masters":92.13,"score_torrey":null,"score_riviera":90,"score_par4":77.08,"score_random":42.71,"raw_sg_ott":0.188,"raw_sg_putt":1.033,"raw_sg_app":0.369,"raw_sg_arg":0.45,"raw_sg_ttg":1.007,"raw_par4":3.89,"riv2024":"N/A","riv2023":"-9","riv2022":"N/A","riv2021":"N/A","masters2025":"8","torrey2026":"N/A"},{"rank":6,"name":"Si Woo Kim","total":75.58,"score_sg_ott":90.19,"score_sg_putt":38.9,"score_sg_app":93.32,"score_sg_arg":49.4,"score_sg_ttg":100.0,"score_masters":null,"score_torrey":null,"score_riviera":55,"score_par4":85.42,"score_random":38.7,"raw_sg_ott":0.717,"raw_sg_putt":-0.565,"raw_sg_app":1.431,"raw_sg_arg":0.151,"raw_sg_ttg":2.299,"raw_par4":3.85,"riv2024":"N/A","riv2023":"CUT","riv2022":"3","riv2021":"N/A","masters2025":"N/A","torrey2026":"N/A"},{"rank":7,"name":"Patrick Cantlay","total":73.98,"score_sg_ott":71.52,"score_sg_putt":53.84,"score_sg_app":79.94,"score_sg_arg":55.29,"score_sg_ttg":83.26,"score_masters":60.67,"score_torrey":null,"score_riviera":92,"score_par4":81.25,"score_random":58.46,"raw_sg_ott":0.129,"raw_sg_putt":0.038,"raw_sg_app":0.886,"raw_sg_arg":0.312,"raw_sg_ttg":1.328,"raw_par4":3.87,"riv2024":"N/A","riv2023":"-14","riv2022":"-5","riv2021":"N/A","masters2025":"36","torrey2026":"N/A"},{"rank":8,"name":"Shane Lowry","total":74.8,"score_sg_ott":77.94,"score_sg_putt":75.5,"score_sg_app":78.17,"score_sg_arg":37.21,"score_sg_ttg":76.97,"score_masters":53.93,"score_torrey":null,"score_riviera":87,"score_par4":100.0,"score_random":23.48,"raw_sg_ott":0.331,"raw_sg_putt":0.912,"raw_sg_app":0.814,"raw_sg_arg":-0.182,"raw_sg_ttg":0.963,"raw_par4":3.78,"riv2024":"N/A","riv2023":"-7","riv2022":"N/A","riv2021":"N/A","masters2025":"42","torrey2026":"N/A"},{"rank":9,"name":"Hideki Matsuyama","total":73.3,"score_sg_ott":53.33,"score_sg_putt":62.83,"score_sg_app":86.54,"score_sg_arg":73.47,"score_sg_ttg":86.56,"score_masters":77.53,"score_torrey":null,"score_riviera":80,"score_par4":70.83,"score_random":35.76,"raw_sg_ott":-0.444,"raw_sg_putt":0.401,"raw_sg_app":1.155,"raw_sg_arg":0.809,"raw_sg_ttg":1.519,"raw_par4":3.92,"riv2024":"1","riv2023":"CUT","riv2022":"-17","riv2021":"N/A","masters2025":"21","torrey2026":"N/A"},{"rank":10,"name":"Will Zalatoris","total":73.51,"score_sg_ott":83.56,"score_sg_putt":52.43,"score_sg_app":72.96,"score_sg_arg":54.77,"score_sg_ttg":84.64,"score_masters":null,"score_torrey":null,"score_riviera":82,"score_par4":79.17,"score_random":24.79,"raw_sg_ott":0.508,"raw_sg_putt":-0.019,"raw_sg_app":0.602,"raw_sg_arg":0.298,"raw_sg_ttg":1.408,"raw_par4":3.88,"riv2024":"N/A","riv2023":"-13","riv2022":"-6","riv2021":"N/A","masters2025":"-","torrey2026":"N/A"},{"rank":11,"name":"Collin Morikawa","total":73.23,"score_sg_ott":84.25,"score_sg_putt":37.98,"score_sg_app":86.96,"score_sg_arg":44.09,"score_sg_ttg":89.81,"score_masters":85.39,"score_torrey":null,"score_riviera":95,"score_par4":70.83,"score_random":35.9,"raw_sg_ott":0.53,"raw_sg_putt":-0.602,"raw_sg_app":1.172,"raw_sg_arg":0.006,"raw_sg_ttg":1.708,"raw_par4":3.92,"riv2024":"N/A","riv2023":"-11","riv2022":"-17","riv2021":"N/A","masters2025":"14","torrey2026":"N/A"},{"rank":12,"name":"Russell Henley","total":73.0,"score_sg_ott":67.65,"score_sg_putt":64.07,"score_sg_app":77.73,"score_sg_arg":49.73,"score_sg_ttg":76.97,"score_masters":null,"score_torrey":null,"score_riviera":70,"score_par4":79.17,"score_random":60.9,"raw_sg_ott":0.007,"raw_sg_putt":0.451,"raw_sg_app":0.796,"raw_sg_arg":0.16,"raw_sg_ttg":0.963,"raw_par4":3.88,"riv2024":"N/A","riv2023":"CUT","riv2022":"-5","riv2021":"N/A","masters2025":"-","torrey2026":"N/A"},{"rank":13,"name":"Harris English","total":72.4,"score_sg_ott":98.35,"score_sg_putt":62.51,"score_sg_app":58.64,"score_sg_arg":35.13,"score_sg_ttg":73.37,"score_masters":87.64,"score_torrey":null,"score_riviera":78,"score_par4":75.0,"score_random":33.21,"raw_sg_ott":0.974,"raw_sg_putt":0.388,"raw_sg_app":0.019,"raw_sg_arg":-0.239,"raw_sg_ttg":0.754,"raw_par4":3.9,"riv2024":"N/A","riv2023":"-8","riv2022":"N/A","riv2021":"N/A","masters2025":"12","torrey2026":"N/A"},{"rank":14,"name":"Xander Schauffele","total":70.8,"score_sg_ott":87.56,"score_sg_putt":62.64,"score_sg_app":61.08,"score_sg_arg":29.31,"score_sg_ttg":66.46,"score_masters":92.13,"score_torrey":null,"score_riviera":75,"score_par4":70.83,"score_random":69.76,"raw_sg_ott":0.634,"raw_sg_putt":0.393,"raw_sg_app":0.118,"raw_sg_arg":-0.398,"raw_sg_ttg":0.353,"raw_par4":3.92,"riv2024":"N/A","riv2023":"-3","riv2022":"-9","riv2021":"N/A","masters2025":"8","torrey2026":"N/A"},{"rank":15,"name":"Jake Knapp","total":72.26,"score_sg_ott":87.52,"score_sg_putt":78.82,"score_sg_app":65.4,"score_sg_arg":54.26,"score_sg_ttg":81.25,"score_masters":null,"score_torrey":null,"score_riviera":null,"score_par4":79.17,"score_random":27.94,"raw_sg_ott":0.633,"raw_sg_putt":1.046,"raw_sg_app":0.294,"raw_sg_arg":0.284,"raw_sg_ttg":1.211,"raw_par4":3.88,"riv2024":"N/A","riv2023":"N/A","riv2022":"N/A","riv2021":"N/A","masters2025":"N/A","torrey2026":"N/A"},{"rank":16,"name":"Maverick McNealy","total":72.17,"score_sg_ott":77.52,"score_sg_putt":57.58,"score_sg_app":70.78,"score_sg_arg":52.43,"score_sg_ttg":78.73,"score_masters":65.17,"score_torrey":null,"score_riviera":85,"score_par4":72.92,"score_random":41.89,"raw_sg_ott":0.318,"raw_sg_putt":0.189,"raw_sg_app":0.513,"raw_sg_arg":0.234,"raw_sg_ttg":1.065,"raw_par4":3.91,"riv2024":"N/A","riv2023":"N/A","riv2022":"-12","riv2021":"N/A","masters2025":"32","torrey2026":"N/A"},{"rank":17,"name":"Nicolai Højgaard","total":72.11,"score_sg_ott":95.17,"score_sg_putt":67.2,"score_sg_app":76.13,"score_sg_arg":45.19,"score_sg_ttg":88.66,"score_masters":null,"score_torrey":null,"score_riviera":null,"score_par4":70.83,"score_random":33.67,"raw_sg_ott":0.874,"raw_sg_putt":0.577,"raw_sg_app":0.731,"raw_sg_arg":0.036,"raw_sg_ttg":1.641,"raw_par4":3.92,"riv2024":"N/A","riv2023":"N/A","riv2022":"N/A","riv2021":"N/A","masters2025":"-","torrey2026":"N/A"},{"rank":18,"name":"Rickie Fowler","total":71.0,"score_sg_ott":71.08,"score_sg_putt":68.76,"score_sg_app":77.65,"score_sg_arg":30.95,"score_sg_ttg":69.96,"score_masters":null,"score_torrey":null,"score_riviera":65,"score_par4":81.25,"score_random":56.55,"raw_sg_ott":0.115,"raw_sg_putt":0.64,"raw_sg_app":0.793,"raw_sg_arg":-0.353,"raw_sg_ttg":0.556,"raw_par4":3.87,"riv2024":"N/A","riv2023":"-5","riv2022":"-2","riv2021":"N/A","masters2025":"N/A","torrey2026":"N/A"},{"rank":19,"name":"Justin Rose","total":70.47,"score_sg_ott":70.13,"score_sg_putt":74.65,"score_sg_app":80.72,"score_sg_arg":28.54,"score_sg_ttg":70.44,"score_masters":98.88,"score_torrey":null,"score_riviera":null,"score_par4":83.33,"score_random":69.9,"raw_sg_ott":0.085,"raw_sg_putt":0.878,"raw_sg_app":0.918,"raw_sg_arg":-0.419,"raw_sg_ttg":0.584,"raw_par4":3.86,"riv2024":"1","riv2023":"N/A","riv2022":"N/A","riv2021":"N/A","masters2025":"2","torrey2026":"N/A"},{"rank":20,"name":"Ryan Gerard","total":70.15,"score_sg_ott":77.3,"score_sg_putt":71.06,"score_sg_app":78.02,"score_sg_arg":38.89,"score_sg_ttg":77.32,"score_masters":null,"score_torrey":null,"score_riviera":null,"score_par4":83.33,"score_random":51.05,"raw_sg_ott":0.311,"raw_sg_putt":0.733,"raw_sg_app":0.808,"raw_sg_arg":-0.136,"raw_sg_ttg":0.983,"raw_par4":3.86,"riv2024":"N/A","riv2023":"N/A","riv2022":"N/A","riv2021":"N/A","masters2025":"N/A","torrey2026":"N/A"}];
+
+const DEFAULT_WEIGHTS = { sg_ott:15, sg_putt:15, sg_app:12, sg_arg:11, sg_ttg:11, masters:5, torrey:5, riviera:10, par4:11, random:5 };
+
+const CATEGORIES = [
+  { key:"sg_ott", label:"SG: Off the Tee", shortLabel:"OTT", color:"#f97316" },
+  { key:"sg_putt", label:"SG: Putting", shortLabel:"PUTT", color:"#8b5cf6" },
+  { key:"sg_app", label:"SG: Approach", shortLabel:"APP", color:"#06b6d4" },
+  { key:"sg_arg", label:"SG: Around Green", shortLabel:"ARG", color:"#10b981" },
+  { key:"sg_ttg", label:"SG: Tee to Green", shortLabel:"T2G", color:"#f59e0b" },
+  { key:"masters", label:"Augusta 2025", shortLabel:"AUG", color:"#ef4444" },
+  { key:"torrey", label:"Torrey 2026", shortLabel:"TOR", color:"#64748b" },
+  { key:"riviera", label:"Riviera History", shortLabel:"RIV", color:"#22c55e" },
+  { key:"par4", label:"Par 4 Scoring", shortLabel:"P4", color:"#a78bfa" },
+  { key:"random", label:"Randomness Factor", shortLabel:"RND", color:"#94a3b8" },
+];
+
+const MEDALS = ["#FFD700","#C0C0C0","#CD7F32","#818cf8","#818cf8","#818cf8","#818cf8","#818cf8","#818cf8","#818cf8"];
+
+function computeScores(players, weights) {
+  return players.map(p => {
+    let score = 0, used = 0;
+    CATEGORIES.forEach(({ key }) => {
+      const val = p[`score_${key}`];
+      const w = weights[key] / 100;
+      if (val != null) { score += val * w; used += w; }
+    });
+    return { ...p, computed: used > 0 ? score / used : 0 };
+  }).sort((a, b) => b.computed - a.computed).map((p, i) => ({ ...p, rank: i + 1 }));
+}
+
+export default function App() {
+  const [weights, setWeights] = useState(DEFAULT_WEIGHTS);
+  const [selected, setSelected] = useState(null);
+  const [view, setView] = useState("leaderboard");
+
+  const players = useMemo(() => computeScores(RAW_PLAYERS, weights), [weights]);
+  const top10 = players.slice(0, 10);
+  const selectedPlayer = selected ? players.find(p => p.name === selected) : null;
+  const totalWeight = Object.values(weights).reduce((a,b)=>a+b,0);
+
+  const radarData = selectedPlayer ? CATEGORIES.map(c => ({ subject: c.shortLabel, value: selectedPlayer[`score_${c.key}`] ?? 0, fullMark: 100 })) : [];
+  const barData = top10.map(p => ({ name: p.name.split(' ').pop(), full: p.name, value: parseFloat(p.computed.toFixed(1)) }));
+
+  return (
+    <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#080d18 0%,#0c1526 60%,#080d18 100%)", fontFamily:"'Georgia',serif", color:"#e2e8f0" }}>
+      <div style={{ background:"linear-gradient(90deg,#0f1f2d,#162436,#0f1f2d)", borderBottom:"1px solid rgba(168,139,84,0.25)", padding:"18px 28px" }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", maxWidth:1100, margin:"0 auto" }}>
+          <div>
+            <div style={{ fontSize:10, letterSpacing:4, color:"#a88b54", textTransform:"uppercase", marginBottom:3 }}>2026 PGA Tour · Riviera Country Club · Pacific Palisades, CA</div>
+            <div style={{ fontSize:26, fontWeight:"bold", color:"#fff", letterSpacing:0.5 }}>Genesis Invitational</div>
+            <div style={{ fontSize:12, color:"#475569", marginTop:2 }}>Predictive Model · 10-Category Weighted Analysis</div>
+          </div>
+          <div style={{ display:"flex", gap:6 }}>
+            {["leaderboard","weights","compare"].map(v => (
+              <button key={v} onClick={() => setView(v)} style={{ padding:"7px 16px", borderRadius:6, border:"1px solid", borderColor:view===v?"#a88b54":"rgba(148,163,184,0.15)", background:view===v?"rgba(168,139,84,0.12)":"transparent", color:view===v?"#a88b54":"#475569", cursor:"pointer", fontSize:12, letterSpacing:1, textTransform:"capitalize" }}>{v}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:"22px 28px" }}>
+
+        {view === "leaderboard" && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 360px", gap:22 }}>
+            <div>
+              <div style={{ fontSize:11, letterSpacing:3, color:"#a88b54", textTransform:"uppercase", marginBottom:14 }}>Predicted Top 10 Finishers</div>
+              {top10.map((player, i) => (
+                <div key={player.name} onClick={() => setSelected(selected===player.name?null:player.name)} style={{ marginBottom:8, padding:"13px 16px", borderRadius:10, cursor:"pointer", border:`1px solid ${selected===player.name?MEDALS[i]:"rgba(255,255,255,0.05)"}`, background:selected===player.name?`rgba(${i===0?"255,215,0":i===1?"192,192,192":i===2?"205,127,50":"129,140,248"},0.06)`:"rgba(255,255,255,0.02)", transition:"all 0.15s" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                    <div style={{ width:34, height:34, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", background:`rgba(${i===0?"255,215,0":i===1?"192,192,192":i===2?"205,127,50":"129,140,248"},0.1)`, border:`1.5px solid ${MEDALS[i]}`, fontSize:13, fontWeight:"bold", color:MEDALS[i], flexShrink:0 }}>{i+1}</div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                        <span style={{ fontSize:15, fontWeight:"bold", color:"#f1f5f9" }}>{player.name}</span>
+                        <span style={{ fontSize:17, fontWeight:"bold", color:i<3?MEDALS[i]:"#818cf8" }}>{player.computed.toFixed(1)}</span>
+                      </div>
+                      <div style={{ display:"flex", gap:2, marginTop:5 }}>
+                        {CATEGORIES.slice(0,9).map(c => { const v = player[`score_${c.key}`]; return <div key={c.key} style={{ flex:1, height:3, borderRadius:2, background:v!=null?c.color:"rgba(255,255,255,0.04)", opacity:v!=null?0.5+(v/200):0.1 }} title={`${c.label}: ${v?.toFixed(0)??"N/A"}`} />; })}
+                      </div>
+                      <div style={{ display:"flex", gap:6, marginTop:5, fontSize:11, color:"#475569", flexWrap:"wrap" }}>
+                        {[["'24",player.riv2024],["'23",player.riv2023],["'22",player.riv2022]].filter(([,v])=>v&&v!=="N/A").map(([yr,v])=>(
+                          <span key={yr} style={{ background:"rgba(255,255,255,0.04)", padding:"1px 5px", borderRadius:3 }}>Riv {yr}: <span style={{ color:v==="CUT"?"#ef4444":v&&parseInt(v)<0?"#22c55e":"#64748b" }}>{v}</span></span>
+                        ))}
+                        {player.masters2025&&player.masters2025!=="N/A"&&player.masters2025!=="-"&&<span style={{ background:"rgba(255,255,255,0.04)", padding:"1px 5px", borderRadius:3 }}>Masters: <span style={{color:"#22c55e"}}>T{player.masters2025}</span></span>}
+                      </div>
+                    </div>
+                  </div>
+                  {selected===player.name && (
+                    <div style={{ marginTop:12, paddingTop:12, borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ display:"grid", gridTemplateColumns:"repeat(5,1fr)", gap:8 }}>
+                        {CATEGORIES.slice(0,9).map(c => { const v = player[`score_${c.key}`]; return (
+                          <div key={c.key} style={{ textAlign:"center" }}>
+                            <div style={{ fontSize:10, color:"#475569", letterSpacing:1, textTransform:"uppercase", marginBottom:2 }}>{c.shortLabel}</div>
+                            <div style={{ fontSize:15, fontWeight:"bold", color:v!=null?c.color:"#1e293b" }}>{v!=null?v.toFixed(0):"—"}</div>
+                          </div>
+                        ); })}
+                      </div>
+                      <div style={{ marginTop:10, display:"flex", gap:14, fontSize:11, color:"#475569" }}>
+                        <span>OTT: <b style={{color:"#e2e8f0"}}>{player.raw_sg_ott?.toFixed(3)}</b></span>
+                        <span>Putt: <b style={{color:"#e2e8f0"}}>{player.raw_sg_putt?.toFixed(3)}</b></span>
+                        <span>App: <b style={{color:"#e2e8f0"}}>{player.raw_sg_app?.toFixed(3)}</b></span>
+                        <span>ARG: <b style={{color:"#e2e8f0"}}>{player.raw_sg_arg?.toFixed(3)}</b></span>
+                        <span>Par4: <b style={{color:"#e2e8f0"}}>{player.raw_par4?.toFixed(2)}</b></span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <div style={{ fontSize:11, letterSpacing:3, color:"#a88b54", textTransform:"uppercase", marginBottom:14 }}>Score Distribution</div>
+              <div style={{ background:"rgba(255,255,255,0.02)", borderRadius:10, border:"1px solid rgba(255,255,255,0.05)", padding:14, marginBottom:18 }}>
+                <ResponsiveContainer width="100%" height={255}>
+                  <BarChart data={barData} layout="vertical" margin={{left:8,right:28,top:0,bottom:0}}>
+                    <XAxis type="number" domain={[50,95]} tick={{fill:"#475569",fontSize:10}} />
+                    <YAxis type="category" dataKey="name" tick={{fill:"#94a3b8",fontSize:11}} width={76} />
+                    <Tooltip formatter={(v)=>[v.toFixed(1),"Model Score"]} labelFormatter={l=>barData.find(d=>d.name===l)?.full||l} contentStyle={{background:"#0c1526",border:"1px solid rgba(255,255,255,0.08)",borderRadius:6,fontSize:11}} />
+                    <Bar dataKey="value" radius={[0,4,4,0]}>
+                      {barData.map((_,i)=><Cell key={i} fill={i<3?MEDALS[i]:"#818cf8"} opacity={1-i*0.035}/>)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div style={{ fontSize:11, letterSpacing:3, color:"#334155", textTransform:"uppercase", marginBottom:8 }}>Contenders 11–20</div>
+              {players.slice(10,20).map((p,i)=>(
+                <div key={p.name} style={{ display:"flex", justifyContent:"space-between", padding:"6px 10px", borderRadius:6, marginBottom:3, background:"rgba(255,255,255,0.015)", border:"1px solid rgba(255,255,255,0.03)" }}>
+                  <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                    <span style={{ color:"#334155", fontSize:12, width:18 }}>{i+11}</span>
+                    <span style={{ fontSize:13, color:"#94a3b8" }}>{p.name}</span>
+                  </div>
+                  <span style={{ fontSize:13, color:"#475569" }}>{p.computed.toFixed(1)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {view === "weights" && (
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:28 }}>
+            <div>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+                <div style={{ fontSize:11, letterSpacing:3, color:"#a88b54", textTransform:"uppercase" }}>Adjust Category Weights</div>
+                <button onClick={() => setWeights(DEFAULT_WEIGHTS)} style={{ padding:"5px 12px", borderRadius:6, border:"1px solid rgba(168,139,84,0.25)", background:"rgba(168,139,84,0.07)", color:"#a88b54", cursor:"pointer", fontSize:11 }}>Reset</button>
+              </div>
+              <div style={{ background:"rgba(255,255,255,0.02)", borderRadius:10, border:"1px solid rgba(255,255,255,0.05)", padding:18 }}>
+                <div style={{ marginBottom:14, padding:"7px 12px", borderRadius:6, background:totalWeight===100?"rgba(34,197,94,0.08)":"rgba(239,68,68,0.08)", border:`1px solid ${totalWeight===100?"rgba(34,197,94,0.25)":"rgba(239,68,68,0.25)"}`, fontSize:12, color:totalWeight===100?"#22c55e":"#ef4444" }}>
+                  Total: <b>{totalWeight}%</b> {totalWeight!==100?`— ${Math.abs(100-totalWeight)}% ${totalWeight<100?"under":"over"}`:"✓ Perfectly balanced"}
+                </div>
+                {CATEGORIES.map(c => (
+                  <div key={c.key} style={{ marginBottom:14 }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:7 }}>
+                        <div style={{ width:8, height:8, borderRadius:"50%", background:c.color }} />
+                        <span style={{ fontSize:13, color:"#94a3b8" }}>{c.label}</span>
+                      </div>
+                      <span style={{ fontSize:13, fontWeight:"bold", color:c.color }}>{weights[c.key]}%</span>
+                    </div>
+                    <input type="range" min="0" max="40" value={weights[c.key]} onChange={e=>setWeights(prev=>({...prev,[c.key]:Number(e.target.value)}))} style={{ width:"100%", accentColor:c.color, cursor:"pointer", height:4 }} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize:11, letterSpacing:3, color:"#a88b54", textTransform:"uppercase", marginBottom:18 }}>Live Rankings</div>
+              {players.slice(0,15).map((p,i)=>(
+                <div key={p.name} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"9px 14px", marginBottom:5, borderRadius:8, background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.04)" }}>
+                  <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+                    <span style={{ width:22, height:22, borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:"bold", background:`rgba(${i===0?"255,215,0":i===1?"192,192,192":i===2?"205,127,50":"129,140,248"},0.1)`, color:MEDALS[i] }}>{i+1}</span>
+                    <span style={{ fontSize:13, color:"#cbd5e1" }}>{p.name}</span>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                    <div style={{ width:100, height:5, background:"rgba(255,255,255,0.04)", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{ height:"100%", width:`${(p.computed/100)*100}%`, background:i<3?MEDALS[i]:"#818cf8", borderRadius:3, transition:"width 0.3s" }} />
+                    </div>
+                    <span style={{ fontSize:14, fontWeight:"bold", color:i<3?MEDALS[i]:"#818cf8", minWidth:34, textAlign:"right" }}>{p.computed.toFixed(1)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {view === "compare" && (
+          <div>
+            <div style={{ fontSize:11, letterSpacing:3, color:"#a88b54", textTransform:"uppercase", marginBottom:14 }}>Player Deep Dive</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:7, marginBottom:22 }}>
+              {players.slice(0,20).map(p=>(
+                <button key={p.name} onClick={()=>setSelected(selected===p.name?null:p.name)} style={{ padding:"6px 13px", borderRadius:20, border:`1px solid ${selected===p.name?"#a88b54":"rgba(255,255,255,0.07)"}`, background:selected===p.name?"rgba(168,139,84,0.12)":"rgba(255,255,255,0.02)", color:selected===p.name?"#a88b54":"#64748b", cursor:"pointer", fontSize:12 }}>{p.name}</button>
+              ))}
+            </div>
+            {selectedPlayer ? (
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+                <div style={{ background:"rgba(255,255,255,0.02)", borderRadius:10, border:"1px solid rgba(255,255,255,0.05)", padding:22 }}>
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:21, fontWeight:"bold", color:"#f1f5f9" }}>{selectedPlayer.name}</div>
+                    <div style={{ fontSize:13, color:"#475569" }}>Rank #{selectedPlayer.rank} · Score {selectedPlayer.computed.toFixed(2)}/100</div>
+                  </div>
+                  <ResponsiveContainer width="100%" height={270}>
+                    <RadarChart data={radarData}>
+                      <PolarGrid stroke="rgba(255,255,255,0.06)" />
+                      <PolarAngleAxis dataKey="subject" tick={{fill:"#64748b",fontSize:11}} />
+                      <Radar dataKey="value" stroke="#a88b54" fill="#a88b54" fillOpacity={0.18} strokeWidth={2} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{ background:"rgba(255,255,255,0.02)", borderRadius:10, border:"1px solid rgba(255,255,255,0.05)", padding:22 }}>
+                  <div style={{ fontSize:11, letterSpacing:3, color:"#475569", textTransform:"uppercase", marginBottom:14 }}>Category Scores</div>
+                  {CATEGORIES.map(c => { const v = selectedPlayer[`score_${c.key}`]; return (
+                    <div key={c.key} style={{ marginBottom:10 }}>
+                      <div style={{ display:"flex", justifyContent:"space-between", marginBottom:3, fontSize:12 }}>
+                        <span style={{color:"#64748b"}}>{c.label}</span>
+                        <span style={{color:v!=null?c.color:"#1e293b",fontWeight:"bold"}}>{v!=null?v.toFixed(1):"N/A"}</span>
+                      </div>
+                      <div style={{ height:5, background:"rgba(255,255,255,0.04)", borderRadius:3, overflow:"hidden" }}>
+                        <div style={{ height:"100%", width:`${v??0}%`, background:v!=null?c.color:"transparent", borderRadius:3, opacity:0.75, transition:"width 0.4s" }} />
+                      </div>
+                    </div>
+                  ); })}
+                  <div style={{ marginTop:14, display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, fontSize:11 }}>
+                    {[["SG OTT",selectedPlayer.raw_sg_ott?.toFixed(3)],["SG Putting",selectedPlayer.raw_sg_putt?.toFixed(3)],["SG Approach",selectedPlayer.raw_sg_app?.toFixed(3)],["SG ARG",selectedPlayer.raw_sg_arg?.toFixed(3)],["SG T2G",selectedPlayer.raw_sg_ttg?.toFixed(3)],["Par 4 Avg",selectedPlayer.raw_par4?.toFixed(2)]].map(([label,v])=>(
+                      <div key={label} style={{ background:"rgba(255,255,255,0.03)", padding:"7px 10px", borderRadius:6 }}>
+                        <div style={{color:"#475569",marginBottom:2}}>{label}</div>
+                        <div style={{color:"#e2e8f0",fontWeight:"bold",fontSize:14}}>{v??"—"}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ marginTop:10, display:"flex", gap:6, flexWrap:"wrap", fontSize:11 }}>
+                    {[["Riv '24",selectedPlayer.riv2024],["Riv '23",selectedPlayer.riv2023],["Riv '22",selectedPlayer.riv2022],["Masters '25",selectedPlayer.masters2025]].map(([yr,v])=>(
+                      <div key={yr} style={{ padding:"4px 9px", borderRadius:6, background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.05)" }}>
+                        <span style={{color:"#475569"}}>{yr}: </span>
+                        <span style={{color:v==="CUT"?"#ef4444":v&&v!=="N/A"&&v!=="-"&&parseInt(v)<0?"#22c55e":"#64748b",fontWeight:"bold"}}>{v??"N/A"}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ textAlign:"center", padding:"60px 0", color:"#1e293b", fontSize:14 }}>Select a player above to view their full breakdown</div>
+            )}
+          </div>
+        )}
+      </div>
+      <div style={{ textAlign:"center", padding:"16px", color:"#1a2535", fontSize:10, letterSpacing:2, textTransform:"uppercase" }}>
+        Genesis Invitational 2026 · Predictive Model · Data: PGA Tour Official Stats
+      </div>
+    </div>
+  );
+}
